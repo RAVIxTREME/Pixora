@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    {% if posts %}
+      {% for post in posts %}
+      <div class="card post-card">
+        <div class="card-header d-flex align-items-center gap-2 py-2">
+          <i class="fa fa-user-circle fa-lg text-muted"></i>
+          <a href="{% url 'profile' post.user.username %}" class="fw-bold text-white">{{ post.user.username }}</a>
+          <span class="text-muted ms-auto" style="font-size:0.8rem">{{ post.created_at|timesince }} ago</span>
+        </div>
+        <a href="{% url 'post_detail' post.id %}">
+          <img src="{{ post.image.url }}" class="post-image"/>
+        </a>
+        <div class="card-body py-2">
+          <div class="d-flex gap-3 mb-2">
+            <button class="like-btn" onclick="toggleLike({{ post.id }}, this)">
+              <i class="fa fa-heart"></i>
+            </button>
+            <a href="{% url 'post_detail' post.id %}" class="comment-btn">
+              <i class="fa fa-comment"></i>
+            </a>
+          </div>
+          <div class="fw-bold text-white" id="like-count-{{ post.id }}">{{ post.likes.count }} likes</div>
+          {% if post.caption %}
+          <div class="mt-1"><span class="fw-bold text-white">{{ post.user.username }}</span> {{ post.caption }}</div>
+          {% endif %}
+          <a href="{% url 'post_detail' post.id %}" class="text-muted" style="font-size:0.85rem">
+            View all {{ post.comments.count }} comments
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="text-center py-5">
+        <i class="fa fa-camera fa-3x text-muted mb-3"></i>
+        <p class="text-muted">No posts yet! <a href="{% url 'explore' %}">Explore</a> aur logo ko follow karo!</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+<script>
+function toggleLike(postId, btn) {
+  fetch(`/post/${postId}/like/`)
+  .then(r => r.json())
+  .then(data => {
+    btn.classList.toggle('liked', data.liked);
+    document.getElementById(`like-count-${postId}`).textContent = data.count + ' likes';
+  });
+}
+</script>
+{% endblock %}

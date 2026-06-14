@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-9">
+    <div class="card">
+      <div class="row g-0" style="min-height:400px">
+        <div class="col-md-7">
+          <img src="{{ post.image.url }}" style="width:100%;height:100%;object-fit:cover;border-radius:12px 0 0 12px"/>
+        </div>
+        <div class="col-md-5 d-flex flex-column">
+          <div class="d-flex align-items-center gap-2 p-3 border-bottom border-secondary">
+            <a href="{% url 'profile' post.user.username %}" class="fw-bold text-white">{{ post.user.username }}</a>
+            {% if post.user == request.user %}
+            <a href="{% url 'delete_post' post.id %}" class="ms-auto text-danger" onclick="return confirm('Delete this post?')">
+              <i class="fa fa-trash"></i>
+            </a>
+            {% endif %}
+          </div>
+          {% if post.caption %}
+          <div class="p-3 border-bottom border-secondary">
+            <span class="fw-bold text-white">{{ post.user.username }}</span> {{ post.caption }}
+          </div>
+          {% endif %}
+          <div class="flex-grow-1 overflow-auto p-3" style="max-height:280px">
+            {% for comment in comments %}
+            <div class="mb-2 d-flex justify-content-between align-items-start">
+              <div>
+                <a href="{% url 'profile' comment.user.username %}" class="fw-bold text-white">{{ comment.user.username }}</a>
+                <span class="ms-2">{{ comment.text }}</span>
+              </div>
+              {% if comment.user == request.user %}
+              <a href="{% url 'delete_comment' comment.id %}" class="text-danger ms-2"><i class="fa fa-times"></i></a>
+              {% endif %}
+            </div>
+            {% empty %}
+            <p class="text-muted">No comments yet!</p>
+            {% endfor %}
+          </div>
+          <div class="p-3 border-top border-secondary">
+            <div class="d-flex gap-3 mb-2">
+              <button class="like-btn {% if liked %}liked{% endif %}" id="like-btn" onclick="toggleLike({{ post.id }})">
+                <i class="fa fa-heart"></i>
+              </button>
+            </div>
+            <div class="fw-bold text-white mb-2" id="like-count">{{ like_count }} likes</div>
+            <form method="POST" action="{% url 'add_comment' post.id %}" class="d-flex gap-2">
+              {% csrf_token %}
+              <input type="text" name="text" class="form-control form-control-sm" placeholder="Add a comment..."/>
+              <button type="submit" class="btn btn-sm btn-primary">Post</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function toggleLike(postId) {
+  fetch(`/post/${postId}/like/`)
+  .then(r => r.json())
+  .then(data => {
+    const btn = document.getElementById('like-btn');
+    btn.classList.toggle('liked', data.liked);
+    document.getElementById('like-count').textContent = data.count + ' likes';
+  });
+}
+</script>
+{% endblock %}

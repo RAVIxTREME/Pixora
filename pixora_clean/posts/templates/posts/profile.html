@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7">
+    <div class="d-flex align-items-center gap-4 mb-4">
+      <div class="profile-pic-lg">
+        <i class="fa fa-user fa-2x text-white"></i>
+      </div>
+      <div>
+        <h5 class="mb-1 fw-bold text-white">{{ profile_user.username }}</h5>
+        <div class="d-flex gap-4 mb-2">
+          <span><strong>{{ posts.count }}</strong> <span class="text-muted">posts</span></span>
+          <span><strong>{{ followers_count }}</strong> <span class="text-muted">followers</span></span>
+          <span><strong>{{ following_count }}</strong> <span class="text-muted">following</span></span>
+        </div>
+        {% if profile_user != request.user %}
+        <a href="{% url 'toggle_follow' profile_user.username %}" class="btn btn-sm {% if is_following %}btn-outline-light{% else %}btn-primary{% endif %}">
+          {% if is_following %}Unfollow{% else %}Follow{% endif %}
+        </a>
+        {% endif %}
+      </div>
+    </div>
+    <hr style="border-color:#333"/>
+    {% if posts %}
+    <div class="row g-1">
+      {% for post in posts %}
+      <div class="col-4">
+        <a href="{% url 'post_detail' post.id %}">
+          <img src="{{ post.image.url }}" class="grid-post"/>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+      <i class="fa fa-camera fa-3x text-muted mb-3"></i>
+      <p class="text-muted">No posts yet.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

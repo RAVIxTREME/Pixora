@@ -1,5 +1,5 @@
 
-# 📸 Pixora
+# 📸 Pixora new version is coming 
 
 > Instagram-style photo sharing web app built with Django & MySQL.
 
